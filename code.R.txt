@@ -1,0 +1,253 @@
+ 
+
+
+# For multi variab Multiple Linear Regression:
+
+-Import excel file into R then give the file name . example:
+Evapo=read.csv("data.csv",header=T)
+Evapo enter
+
+#Then to check the structure:
+str(Evapo)
+
+#Then for Regression Analysis:
+Reg=lm(E~Tmax+Tmin+Rh1+W,data=Evapo)
+summary(Reg)
+
+#If we wants to predict dependent variable by using some data of independent variable for future reference . example:
+predict(Reg,data.frame("Tmax"=50,"Tmin"=20,"Rh1"=96,"W"=5))
+str(Evapo)
+where; Tmax,Tmin,Rh1,w are independent and E is dependent variable. And Evapo is a file name in the above example.s
+
+#If we forget the no of variables in the file because of large data then we can use to remember the variables as in short forms:
+head(filename)  example:
+head(Evapo)
+
+#If we wants to plot observed data from the data which is given as a dependent variable such as:
+Eo=Evapo$E
+plot(Eo)
+where Eo= observed evaporation data as the data given by sir.
+Ep=predict(Reg,data=Evapo)
+head(Ep)
+
+#To plot the data between observed and predicted values:
+plot(Eo,Ep)
+where Ep= Predicted evaporation
+
+#To find correaltion between Eo and Ep:
+cor(Eo,Ep)
+
+
+#For correlation:
+cor(E,Tmax,Tmin,Rh1,W)
+cor(Evapo)
+pairs(Evapo)
+
+#####################################################
+##################### Non Lineaer Regression##########
+
+train the data 
+train= evap[1:156,]
+train
+ m1=nls(E~A*exp(K*Tmax)+B*Tmin+C*Rh1+D*I(W^2)+F*W+G,evap,start=list(A=5,B=5,C=5,D=5,G=5,K=0.1))
+the above equation is used for whole data A,B,C,D,F,G,K values chosen randomly to find the correct value then correct value occurs.
+m1
+
+Nonlinear regression model
+  model: E ~ A * exp(K * Tmax) + B * Tmin + C * Rh1 + D * I(W^2) + F *     W + G
+   data: evap
+        A         B         C         D         F         G         K 
+ 1.043752 -0.064803 -0.064707  0.005948  0.319443  3.303346  0.055870 
+ residual sum-of-squares: 89.43
+
+Number of iterations to convergence: 8 
+Achieved convergence tolerance: 8.531e-07
+THE ABOVE VALUE OF A, B,C,D,F,G,K IS REAL FOR WHOLE EVAPO DATA.
+
+##NOW FOR ONLY TRAINING DATA
+ m1=nls(E~A*exp(K*Tmax)+B*Tmin+C*Rh1+D*I(W^2)+F*W+G,train,start=list(A=1.043,B=-0.0648,C=-0.065,D=0.0059,F=0.319,G=3.303,K=0.055))
+ m1
+Nonlinear regression model
+  model: E ~ A * exp(K * Tmax) + B * Tmin + C * Rh1 + D * I(W^2) + F *     W + G
+   data: train
+        A         B         C         D         F         G         K 
+ 0.928318 -0.072924 -0.049350  0.007774  0.344230  1.886595  0.059123 
+ residual sum-of-squares: 47.53
+
+Number of iterations to convergence: 5 
+Achieved convergence tolerance: 3.72e-06
+THE ABOVE VALUE ABCDFGK USED NOW FOR TRAINNG BECAUSE THIS IS REAL VALUE WE SHOULD PUT IN THE EQUATION FOR PREDICTION PURPOSE.
+
+mtrain=nls(E~A*exp(K*Tmax)+B*Tmin+C*Rh1+D*I(W^2)+F*W+G,train,start=list(A=0.928,B=-0.0729,C=-0.049,D=0.0077,F=0.344,G=1.88,K=0.059))
+mtrain
+Nonlinear regression model
+  model: E ~ A * exp(K * Tmax) + B * Tmin + C * Rh1 + D * I(W^2) + F *     W + G
+   data: train
+        A         B         C         D         F         G         K 
+ 0.928319 -0.072924 -0.049350  0.007774  0.344230  1.886593  0.059123 
+ residual sum-of-squares: 47.53
+
+Number of iterations to convergence: 3 
+Achieved convergence tolerance: 3.367e-06
+ep= predict (mtrain,train)
+ep
+12 e=train$E
+e11=c(e)
+e11
+ep11=c(ep)
+RMSE1=rmse(e11,ep11)
+because normally rmse can not find in it by using rmse(e,ep)
+Cor(e,ep)
+
+##test the data
+test=evap[1:157,]
+test e2=test$E
+e2 t1=test$Tmax
+t1
+t2=test$Tmin t2
+r=test$Rh1
+w=test$W
+mtest=nls(E~A*exp(K*t1)+B*t2+C*r+D*I(w^2)+F*w+G,test,start=list(A=0.928,B=-0.0729,C=-0.049,D=0.0077,F=0.344,G=1.88,K=0.059))
+mtest
+if we use e2 in place of E it will not run in the above eqn.
+results= Nonlinear regression model
+  model: E ~ A * exp(K * t1) + B * t2 + C * r + D * I(w^2) + F * w + G
+   data: test
+         A          B          C          D          F          G          K 
+ 2.5212593 -0.0505053 -0.0940865 -0.0009485  0.3411631  4.0214495  0.0375247 
+ residual sum-of-squares: 23.09
+
+Number of iterations to convergence: 5 
+Achieved convergence tolerance: 2.763e-06
+mtest=nls(E~A*exp(K*t1)+B*t2+C*r+D*I(w^2)+F*w+G,test,start=list(A=2.521,B=-0.0505,C=-0.094,D=-0.0009485,F=0.341,G=4.021,K=0.037))
+ mtest
+Nonlinear regression model
+  model: E ~ A * exp(K * t1) + B * t2 + C * r + D * I(w^2) + F * w + G
+   data: test
+         A          B          C          D          F          G          K 
+ 2.5212689 -0.0505052 -0.0940866 -0.0009484  0.3411617  4.0214445  0.0375246 
+ residual sum-of-squares: 23.09
+
+Number of iterations to convergence: 2 
+Achieved convergence tolerance: 7.757e-07
+ ep2=predict(mtest,test)
+ ep2
+ d2=data.frame(e2,ep2)
+ d2
+ write.xlsx(d2,"nlstest.xlsx")
+ cor(e2,ep2)
+[1] 0.9792634
+
+#for RMSE
+hydrogof
+ e22=c(e2)
+ e22
+ ep22=c(ep2)
+ ep22
+ r2=rmse(e22,ep22)
+40 r2
+ 
+## for coefficient of determination (R squared)
+ library(caret)
+ res=caret::postResample(e11,ep11)
+ rsq=res[2]
+ rsq
+ res=caret::postResample(e22,ep22)
+ rsq=res[2]   where [2] means square.
+ rsq
+
+
+############## random forest ##################
+summary(evap)
+ str(evap)
+ train=evap[1:156,]
+ train
+ library(randomForest)
+ rf=randomForest(E~Tmax+Tmin+Rh1+W,train)
+ print(rf)
+ summary(rf)
+ attributes(rf)
+
+# select any one attribute from above then it will show its type of data:
+
+ rf$type
+ rf$call
+ library(caret)
+ Ep=predict(rf,train)
+ Ep
+head(train$E)
+ head(Ep)
+ test=evap[157:208,]
+ test
+ e=test$E
+ rf2=randomForest(e~Tmax+Tmin+Rh1+W,test)
+ rf2
+ ep=predict(rf2,test)
+ ep
+ plot(rf2)
+ t=tuneRF(train[,-4],train[,4],stepFactor=0.5,plot=TRUE,ntreeTRy=500,trace=TRUE,improve=0.05)
+ rf=randomForest(E~Tmax+Tmin+Rh1+W,train,ntree=500,mtry=4,importance=TRUE,proximity=TRUE)
+ rf
+ hist(treesize(rf),main="No. of Nodes for the Trees",col="green")
+ importance(rf)
+ 
+
+## FOR Coefficient of determination
+
+library(caret)
+res=caret::postResample(e1,ep1)
+rsq=res[2]
+
+
+#########SVR ############
+load or install package:
+zoo
+e1071
+ svme=svm(E~Tmax+Tmin+Rh1+W,Evapo)
+summary(svme)
+ 
+# If we wants to chnage the name of the variables we can simply use the commands:
+ evap=Evapo
+ T1=evap$Tmax
+ T2=evap$Tmin
+ R=evap$Rh1
+ W=evap$W
+ E=evap$E
+we will define all the variables in the file or data.
+
+-we can use normal regression
+ reg=lm(E~T1+T2+R+W,evap)
+ summary(reg)
+
+-Then we can use:
+ svme=svm(E~T1+T2+R+W,evap)
+ summary(svme)
+
+# Here we wants to predict evaporation in the given example so we can use:
+  predsvm=predict(svme,evap)
+  predsvm
+  Ep=predsvm
+           where Ep is predicted value.
+ head(E)
+ head(Ep)
+ plot(E)
+ plot(Ep)
+ plot(E,Ep)
+ plot(evap$E,Ep,col="red",pch=16) this is for giving any colour to the data points.
+ cor(E,Ep)
+## For finding the coefficient of determination and adjusted R2:
+summary(reg)$r.squared
+summary(reg)$adj.r.squared
+# For calculation of RMSE:
+install(hydroGOF)
+ RMSEsvm=rmse(Ep,evap$E)
+ RMSEsvm
+
+# For export file to excel:
+Install package(openxlsx)
+load package
+write.xlsx(evap,file="SVREvapo.xlsx")
+  where evap is file name R environment and SVREvapo.xlsx is file name saved in by default working directory here the working directory may be desktop or else but for this thr directory is documents. If we wants to save it in another then we go to more and set as working directory
+
+
+
