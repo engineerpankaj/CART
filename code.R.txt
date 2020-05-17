@@ -3,13 +3,13 @@
 
 # For multi variab Multiple Linear Regression:
 
--Import excel file into R then give the file name . example:
+-Import excel file into R then give the file name . example:File having evaporation data termed as Evapo
 Evapo=read.csv("data.csv",header=T)
 Evapo enter
 
 #Then to check the structure:
 str(Evapo)
-
+# T max- maximum temperature, T min, minimum temperature, Rh1 is minimum relative humidity and W is wind velocity
 #Then for Regression Analysis:
 Reg=lm(E~Tmax+Tmin+Rh1+W,data=Evapo)
 summary(Reg)
@@ -43,120 +43,6 @@ cor(E,Tmax,Tmin,Rh1,W)
 cor(Evapo)
 pairs(Evapo)
 
-#####################################################
-##################### Non Lineaer Regression##########
-
-train the data 
-train= evap[1:156,]
-train
- m1=nls(E~A*exp(K*Tmax)+B*Tmin+C*Rh1+D*I(W^2)+F*W+G,evap,start=list(A=5,B=5,C=5,D=5,G=5,K=0.1))
-the above equation is used for whole data A,B,C,D,F,G,K values chosen randomly to find the correct value then correct value occurs.
-m1
-
-Nonlinear regression model
-  model: E ~ A * exp(K * Tmax) + B * Tmin + C * Rh1 + D * I(W^2) + F *     W + G
-   data: evap
-        A         B         C         D         F         G         K 
- 1.043752 -0.064803 -0.064707  0.005948  0.319443  3.303346  0.055870 
- residual sum-of-squares: 89.43
-
-Number of iterations to convergence: 8 
-Achieved convergence tolerance: 8.531e-07
-THE ABOVE VALUE OF A, B,C,D,F,G,K IS REAL FOR WHOLE EVAPO DATA.
-
-##NOW FOR ONLY TRAINING DATA
- m1=nls(E~A*exp(K*Tmax)+B*Tmin+C*Rh1+D*I(W^2)+F*W+G,train,start=list(A=1.043,B=-0.0648,C=-0.065,D=0.0059,F=0.319,G=3.303,K=0.055))
- m1
-Nonlinear regression model
-  model: E ~ A * exp(K * Tmax) + B * Tmin + C * Rh1 + D * I(W^2) + F *     W + G
-   data: train
-        A         B         C         D         F         G         K 
- 0.928318 -0.072924 -0.049350  0.007774  0.344230  1.886595  0.059123 
- residual sum-of-squares: 47.53
-
-Number of iterations to convergence: 5 
-Achieved convergence tolerance: 3.72e-06
-THE ABOVE VALUE ABCDFGK USED NOW FOR TRAINNG BECAUSE THIS IS REAL VALUE WE SHOULD PUT IN THE EQUATION FOR PREDICTION PURPOSE.
-
-mtrain=nls(E~A*exp(K*Tmax)+B*Tmin+C*Rh1+D*I(W^2)+F*W+G,train,start=list(A=0.928,B=-0.0729,C=-0.049,D=0.0077,F=0.344,G=1.88,K=0.059))
-mtrain
-Nonlinear regression model
-  model: E ~ A * exp(K * Tmax) + B * Tmin + C * Rh1 + D * I(W^2) + F *     W + G
-   data: train
-        A         B         C         D         F         G         K 
- 0.928319 -0.072924 -0.049350  0.007774  0.344230  1.886593  0.059123 
- residual sum-of-squares: 47.53
-
-Number of iterations to convergence: 3 
-Achieved convergence tolerance: 3.367e-06
-ep= predict (mtrain,train)
-ep
-12 e=train$E
-e11=c(e)
-e11
-ep11=c(ep)
-RMSE1=rmse(e11,ep11)
-because normally rmse can not find in it by using rmse(e,ep)
-Cor(e,ep)
-
-##test the data
-test=evap[1:157,]
-test e2=test$E
-e2 t1=test$Tmax
-t1
-t2=test$Tmin t2
-r=test$Rh1
-w=test$W
-mtest=nls(E~A*exp(K*t1)+B*t2+C*r+D*I(w^2)+F*w+G,test,start=list(A=0.928,B=-0.0729,C=-0.049,D=0.0077,F=0.344,G=1.88,K=0.059))
-mtest
-if we use e2 in place of E it will not run in the above eqn.
-results= Nonlinear regression model
-  model: E ~ A * exp(K * t1) + B * t2 + C * r + D * I(w^2) + F * w + G
-   data: test
-         A          B          C          D          F          G          K 
- 2.5212593 -0.0505053 -0.0940865 -0.0009485  0.3411631  4.0214495  0.0375247 
- residual sum-of-squares: 23.09
-
-Number of iterations to convergence: 5 
-Achieved convergence tolerance: 2.763e-06
-mtest=nls(E~A*exp(K*t1)+B*t2+C*r+D*I(w^2)+F*w+G,test,start=list(A=2.521,B=-0.0505,C=-0.094,D=-0.0009485,F=0.341,G=4.021,K=0.037))
- mtest
-Nonlinear regression model
-  model: E ~ A * exp(K * t1) + B * t2 + C * r + D * I(w^2) + F * w + G
-   data: test
-         A          B          C          D          F          G          K 
- 2.5212689 -0.0505052 -0.0940866 -0.0009484  0.3411617  4.0214445  0.0375246 
- residual sum-of-squares: 23.09
-
-Number of iterations to convergence: 2 
-Achieved convergence tolerance: 7.757e-07
- ep2=predict(mtest,test)
- ep2
- d2=data.frame(e2,ep2)
- d2
- write.xlsx(d2,"nlstest.xlsx")
- cor(e2,ep2)
-[1] 0.9792634
-
-#for RMSE
-hydrogof
- e22=c(e2)
- e22
- ep22=c(ep2)
- ep22
- r2=rmse(e22,ep22)
-40 r2
- 
-## for coefficient of determination (R squared)
- library(caret)
- res=caret::postResample(e11,ep11)
- rsq=res[2]
- rsq
- res=caret::postResample(e22,ep22)
- rsq=res[2]   where [2] means square.
- rsq
-
-
 ############## random forest ##################
 summary(evap)
  str(evap)
@@ -172,8 +58,7 @@ summary(evap)
 
  rf$type
  rf$call
- library(caret)
- Ep=predict(rf,train)
+  Ep=predict(rf,train)
  Ep
 head(train$E)
  head(Ep)
